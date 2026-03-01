@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LG CLUB - All in One</title>
+    <style>
+        body { background: #000; color: #fff; text-align: center; font-family: sans-serif; margin: 0; }
+        .logo-text { font-size: 35px; font-weight: 900; background: linear-gradient(to bottom, #fff, #ffd700, #b8860b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 5px; padding: 20px 0; display: block; }
+        
+        /* Login Box Styling */
+        #login-page { padding-top: 50px; display: block; }
+        .box { background: #111; border: 1px solid gold; padding: 30px; margin: 20px; border-radius: 20px; box-shadow: 0 0 15px gold; }
+        input { background: #222; border: 1px solid #444; color: gold; padding: 15px; width: 85%; border-radius: 10px; margin-bottom: 15px; outline: none; }
+        .btn { background: gold; color: #000; padding: 15px; width: 92%; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; }
+
+        /* Dashboard Styling (Hidden initially) */
+        #dashboard { display: none; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; }
+        .item { background: #222; padding: 15px; border-radius: 12px; border: 1px solid #333; color: gold; font-weight: bold; }
+        .card { background: #111; border: 1px solid gold; border-radius: 20px; margin: 15px; padding: 25px; }
+        .predict-btn { background: linear-gradient(to right, #ffd700, #daa520); color: #000; padding: 15px; width: 90%; border-radius: 30px; border: none; font-weight: bold; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <span class="logo-text">LG CLUB</span>
+
+    <div id="login-page">
+        <div class="box">
+            <h3 style="margin-top:0;">Member Login</h3>
+            <input type="text" id="u" placeholder="Admin ID">
+            <input type="password" id="p" placeholder="Password">
+            <button onclick="checkLogin()" class="btn">LOGIN</button>
+        </div>
+    </div>
+
+    <div id="dashboard">
+        <div class="grid">
+            <div class="item">🚀 AVIATOR</div>
+            <div class="item">🎣 FISHING</div>
+            <div class="item">🎰 SLOTS</div>
+            <div class="item">🃏 WINGO</div>
+        </div>
+        <div class="card">
+            <div style="color:gray; font-size:14px;">Period: <b id="p-num" style="color:gold;">2026030101</b></div>
+            <h1 id="timer" style="color:red; font-size:40px;">00:30</h1>
+            <div id="res" style="font-size:50px; margin:10px; color:#444;">?</div>
+            <button class="predict-btn" onclick="predict()">GET SIGNAL</button>
+        </div>
+    </div>
+
+    <script>
+        // Login Logic
+        function checkLogin() {
+            let user = document.getElementById('u').value;
+            let pass = document.getElementById('p').value;
+            if(user === "admin" && pass === "1234") {
+                document.getElementById('login-page').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                startTimer();
+            } else { alert("Invalid Credentials!"); }
+        }
+
+        // Timer & Predict Logic
+        let t = 30;
+        function startTimer() {
+            setInterval(() => {
+                if(t <= 0) { 
+                    t = 30; 
+                    document.getElementById('p-num').innerText = parseInt(document.getElementById('p-num').innerText) + 1;
+                }
+                document.getElementById('timer').innerText = "00:" + (t < 10 ? "0"+t : t);
+                t--;
+            }, 1000);
+        }
+
+        function predict() {
+            let n = Math.floor(Math.random() * 10);
+            let display = document.getElementById('res');
+            display.innerText = (n >= 5 ? "BIG" : "SMALL");
+            display.style.color = (n%2==0 ? "#ff3333" : "#00ff7f");
+        }
+    </script>
+</body>
+</html>
