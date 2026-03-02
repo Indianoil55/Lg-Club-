@@ -3,95 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LG CLUB CASINO</title>
+    <title>LG CLUB - PREMIUM CASINO</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        body { background: #0a0a0a; color: white; font-family: 'Arial', sans-serif; margin: 0; text-align: center; }
-        .nav { background: #1a1a1a; padding: 15px; border-bottom: 2px solid gold; font-weight: bold; }
-        .card { background: #222; margin: 10px; padding: 20px; border-radius: 15px; border: 1px solid #444; }
-        .game-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; }
-        .game-btn { background: #333; padding: 20px; border-radius: 10px; border: 1px solid gold; cursor: pointer; }
-        button { background: gold; color: black; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
-        #app-view { display: none; }
+        :root { --gold: #ffdf8e; --dark-red: #1a0a0a; --card: #251212; }
+        body { background: #0b0505; color: #fff; font-family: sans-serif; margin: 0; padding-bottom: 70px; }
+        
+        /* Season 1: Professional Login */
+        #auth-page { padding: 40px 20px; text-align: center; }
+        .login-box { background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid #442222; }
+        input { width: 90%; padding: 15px; margin: 10px 0; background: #110808; border: 1px solid #3d2525; color: #fff; border-radius: 8px; }
+        .btn-gold { background: linear-gradient(180deg, #ffdf8e, #c69433); color: #3d2525; border: none; padding: 15px; width: 100%; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 16px; }
+
+        /* Season 2: Lobby Style */
+        .top-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: var(--dark-red); border-bottom: 1px solid #331a1a; position: sticky; top: 0; z-index: 10; }
+        .bal-pill { background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; color: var(--gold); border: 1px solid #444; font-weight: bold; }
+        
+        .banner-grid { padding: 10px; display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .game-banner { height: 110px; border-radius: 12px; background-size: cover; background-position: center; display: flex; align-items: center; padding-left: 20px; font-size: 20px; font-weight: bold; text-shadow: 2px 2px #000; border: 1px solid #3d2525; }
+
+        /* Season 3: Wallet Card */
+        .wallet-card { background: linear-gradient(135deg, #f3d078 0%, #c69433 100%); color: #3d2525; padding: 25px; border-radius: 15px; margin: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.4); text-align: center; }
+
+        /* Season 4: Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #1a0a0a; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #331a1a; }
+        .nav-item { font-size: 11px; color: #888; text-align: center; cursor: pointer; }
+        .nav-item.active { color: var(--gold); }
+        
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="nav">LG CLUB CASINO</div>
-
-    <div id="auth-view" class="card">
-        <h2>LOGIN / REGISTER</h2>
-        <input type="text" id="user" placeholder="Username"><br>
-        <input type="password" id="pass" placeholder="Password"><br>
-        <input type="text" id="ref-code" placeholder="Referral Code (Optional)"><br>
-        <button onclick="auth()">ENTER</button>
-    </div>
-
-    <div id="app-view">
-        <div class="card">
-            <h3>WALLET: ₹<span id="bal">0</span></h3>
-            <p>ID: <span id="uid"></span></p>
-            <button onclick="document.getElementById('pay-modal').style.display='block'">RECHARGE</button>
-            <button onclick="window.open('https://t.me/your_telegram')">SUPPORT</button>
-        </div>
-
-        <div class="game-grid">
-            <div class="game-btn" onclick="alert('Loading Aviator...')">✈️ AVIATOR</div>
-            <div class="game-btn" onclick="alert('Loading Slots...')">🎰 SLOTS</div>
-            <div class="game-btn" onclick="alert('Loading Julli...')">🔴 COLOR</div>
-            <div class="game-btn" onclick="alert('Loading Mines...')">💣 MINES</div>
+    <div id="auth-page">
+        <h1 style="color:var(--gold); margin-bottom:10px;">IE777.COM</h1>
+        <p style="color:#888;">Welcome Back, Player!</p>
+        <div class="login-box">
+            <input type="text" id="username" placeholder="Mobile / Username">
+            <input type="password" id="password" placeholder="Enter Password">
+            <button class="btn-gold" onclick="handleAuth()">ENTER CASINO</button>
         </div>
     </div>
 
-    <div id="pay-modal" style="display:none; position:fixed; top:20%; left:10%; width:80%; background:#111; padding:20px; border:2px solid gold;">
-        <h3>RECHARGE (₹100+)</h3>
-        <p>UPI: 7470807598-1@nyes</p>
-        <input type="text" id="utr" placeholder="Enter 12-Digit UTR"><br><br>
-        <button onclick="submitUTR()">SUBMIT UTR</button>
+    <div id="main-app" class="hidden">
+        <div class="top-header">
+            <div style="font-weight:bold; color:var(--gold);">IE777</div>
+            <div class="bal-pill">₹<span id="header-bal">0.00</span></div>
+            <div onclick="location.reload()">🔄</div>
+        </div>
+
+        <div id="home-sec">
+            <div class="banner-grid">
+                <div class="game-banner" style="background-image:linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.4)), url('https://i.imgur.com/B7yM7yM.jpg'); color:#ff3333;">🚀 CRASH GAME</div>
+                <div class="game-banner" style="background-image:linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.4)), url('https://i.imgur.com/pYvV8vV.jpg'); color:var(--gold);">🎰 JILI SLOTS</div>
+                <div class="game-banner" style="background-image:linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.4)), url('https://i.imgur.com/LhLhLhL.jpg');">🐟 FISHING</div>
+            </div>
+        </div>
+
+        <div id="wallet-sec" class="hidden">
+            <div class="wallet-card">
+                <div style="font-size:14px; opacity:0.8;">My Balance</div>
+                <div style="font-size:36px; font-weight:bold;">₹<span id="wallet-bal">0.00</span></div>
+            </div>
+            <div style="padding: 0 15px;">
+                <button class="btn-gold" onclick="alert('Deposit via UPI: 7470807598-1@nyes')" style="margin-bottom:10px;">DEPOSIT</button>
+                <button class="btn-gold" style="background:#ff3333; color:#fff;">WITHDRAW</button>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="showTab('home')">🏠<br>HOME</div>
+            <div class="nav-item" onclick="showTab('wallet')">👛<br>WALLET</div>
+            <div class="nav-item" onclick="alert('Invite link copied!')">👥<br>EARN</div>
+            <div class="nav-item" onclick="showTab('profile')">👤<br>ME</div>
+        </div>
     </div>
 
 <script>
+    // Firebase Config
+    const firebaseConfig = { databaseURL: "https://lg-club-db-default-rtdb.firebaseio.com/" };
+    firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    firebase.initializeApp({ databaseURL: "https://lg-club-db-default-rtdb.firebaseio.com/" });
-    
-    let currentU = "";
+    let currentLog = "";
 
-    function auth() {
-        let u = document.getElementById('user').value;
-        let p = document.getElementById('pass').value;
-        let ref = document.getElementById('ref-code').value;
+    function handleAuth() {
+        let u = document.getElementById('username').value;
+        let p = document.getElementById('password').value;
+        if(!u || !p) return alert("Fill all fields");
 
-        db.ref('users/' + u).once('value', (snap) => {
-            if(snap.exists()) {
-                if(snap.val().pass === p) {
-                    currentU = u;
-                    loadApp(snap.val());
-                } else { alert("Wrong Password!"); }
-            } else {
-                // New User Creation
-                let uid = "LG" + Math.floor(1000 + Math.random() * 9000);
-                db.ref('users/' + u).set({ pass: p, balance: 0, uid: uid, refBy: ref || "None" });
-                alert("Account Created! Login Now.");
-            }
+        db.ref('users/' + u).on('value', (snap) => {
+            if(snap.exists() && snap.val().password === p) {
+                currentLog = u;
+                updateUI(snap.val());
+                document.getElementById('auth-page').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+            } else if (!snap.exists()) {
+                // Auto Register
+                db.ref('users/' + u).set({ password: p, balance: 0, uid: Math.floor(Math.random()*8999999)+1000000 });
+            } else { alert("Wrong Password!"); }
         });
     }
 
-    function loadApp(data) {
-        document.getElementById('auth-view').style.display = 'none';
-        document.getElementById('app-view').style.display = 'block';
-        document.getElementById('bal').innerText = data.balance;
-        document.getElementById('uid').innerText = data.uid;
+    function updateUI(data) {
+        let b = (data.balance || 0).toFixed(2);
+        document.getElementById('header-bal').innerText = b;
+        document.getElementById('wallet-bal').innerText = b;
     }
 
-    function submitUTR() {
-        let utr = document.getElementById('utr').value;
-        if(utr.length === 12) {
-            db.ref('recharges/' + utr).set({ user: currentU, status: 'pending' });
-            alert("UTR Submitted! Admin will verify soon.");
-            document.getElementById('pay-modal').style.display = 'none';
-        } else { alert("Invalid UTR"); }
+    function showTab(t) {
+        document.getElementById('home-sec').classList.toggle('hidden', t !== 'home');
+        document.getElementById('wallet-sec').classList.toggle('hidden', t !== 'wallet');
+        // Update nav active class
+        let navs = document.querySelectorAll('.nav-item');
+        navs.forEach((n, i) => n.classList.toggle('active', (t === 'home' && i === 0) || (t === 'wallet' && i === 1)));
     }
 </script>
 </body>
-</html>
+    </html>
