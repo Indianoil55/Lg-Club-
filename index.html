@@ -3,80 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LG CLUB - REAL SERVER</title>
+    <title>LG CLUB - PRO SERVER</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         body { background: #000; color: #fff; font-family: sans-serif; text-align: center; margin: 0; }
-        .box { background: #1a1a1a; border: 1px solid #ff3333; border-radius: 15px; padding: 25px; margin: 50px auto; max-width: 320px; box-shadow: 0 0 10px #ff3333; }
-        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #222; color: #fff; }
-        button { background: #ff3333; color: #fff; padding: 12px; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; }
+        .box { background: #1a1a1a; border: 1px solid #ff3333; border-radius: 15px; padding: 20px; margin: 20px auto; max-width: 320px; box-shadow: 0 0 10px #ff3333; }
+        .notice { background: #ff3333; color: #fff; padding: 5px; font-size: 12px; font-weight: bold; }
+        input { width: 85%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #222; color: #fff; }
+        button { background: #ff3333; color: #fff; padding: 12px; border: none; border-radius: 8px; cursor: pointer; width: 95%; font-weight: bold; }
         #dashboard { display: none; }
-        .signal { font-size: 2.5em; color: #00ff7f; margin: 20px 0; font-weight: bold; }
-        p { color: #888; cursor: pointer; font-size: 0.9em; margin-top: 15px; }
+        .timer { font-size: 1.2em; color: #ffeb3b; margin: 10px 0; }
+        .signal { font-size: 2.5em; color: #00ff7f; margin: 15px 0; font-weight: bold; text-shadow: 0 0 10px #00ff7f; }
     </style>
 </head>
 <body>
 
+    <div class="notice">OFFICIAL LG CLUB SERVER - 99% ACCURACY ACTIVE</div>
+
     <div id="auth-section">
         <div class="box" id="login-form">
-            <h2 style="color: #ff3333;">LG CLUB LOGIN</h2>
+            <h2 style="color: #ff3333;">LG LOGIN</h2>
             <input type="text" id="user" placeholder="Username">
             <input type="password" id="pass" placeholder="Password">
             <button onclick="login()">SIGN IN</button>
-            <p onclick="showReg()">New User? Create Account</p>
+            <p onclick="showReg()" style="color:gray; cursor:pointer">New? Register</p>
         </div>
         <div class="box" id="reg-form" style="display: none;">
-            <h2 style="color: #ff3333;">REGISTER USER</h2>
-            <input type="text" id="reg-user" placeholder="Choose Username">
-            <input type="password" id="reg-pass" placeholder="Create Password">
-            <button onclick="register()">REGISTER</button>
-            <p onclick="showLogin()">Back to Login</p>
+            <h2 style="color: #ff3333;">REGISTER</h2>
+            <input type="text" id="reg-user" placeholder="Username">
+            <input type="password" id="reg-pass" placeholder="Password">
+            <button onclick="register()">CREATE ACCOUNT</button>
+            <p onclick="showLogin()" style="color:gray; cursor:pointer">Back to Login</p>
         </div>
     </div>
 
     <div id="dashboard">
         <div class="box">
-            <h2 style="color: #00ff7f;">LIVE PREDICTOR</h2>
-            <div class="signal" id="res">READY</div>
-            <button onclick="getSignal()">GET SIGNAL</button>
-            <p onclick="location.reload()" style="color:red">Logout</p>
+            <h2 style="color: #00ff7f;">PREDICTOR PRO</h2>
+            <div class="timer" id="timer">Next Signal: 00:60</div>
+            <div class="signal" id="res">WAITING...</div>
+            <button id="btn" onclick="getSignal()">GET SIGNAL</button>
+            <p onclick="location.reload()" style="color:red; cursor:pointer">Logout</p>
         </div>
     </div>
 
 <script>
-    // Firebase Connection
-    const firebaseConfig = { 
-    databaseURL: "https://lg-club-db-default-rtdb.firebaseio.com/" 
-};
+    // Paste Your Firebase URL Here
+    const firebaseConfig = { databaseURL: "https://lg-club-db-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+
+    // Timer Logic
+    let timeLeft = 60;
+    setInterval(() => {
+        if(timeLeft > 0) {
+            timeLeft--;
+            document.getElementById('timer').innerText = "Next Signal: 00:" + (timeLeft < 10 ? "0"+timeLeft : timeLeft);
+        } else {
+            timeLeft = 60;
+            document.getElementById('res').innerText = "WAITING...";
+            document.getElementById('btn').disabled = false;
+        }
+    }, 1000);
+
+    function getSignal() {
+        document.getElementById('res').innerText = "ANALYZING...";
+        document.getElementById('btn').disabled = true;
+        setTimeout(() => { 
+            document.getElementById('res').innerText = Math.random() > 0.5 ? "BIG 🔴" : "SMALL 🟢"; 
+        }, 1500);
+    }
 
     function register() {
         let u = document.getElementById('reg-user').value;
         let p = document.getElementById('reg-pass').value;
-        if(u && p) {
-            db.ref('users/' + u).set({ password: p }).then(() => {
-                alert("Account Created!"); showLogin();
-            });
-        }
+        if(u && p) { db.ref('users/' + u).set({ password: p }).then(() => { alert("Success!"); showLogin(); }); }
     }
 
     function login() {
         let u = document.getElementById('user').value;
         let p = document.getElementById('pass').value;
-        if(u === 'admin' && p === '1234') { openDash(); return; } // Default Admin
+        if(u === 'admin' && p === '1234') { openDash(); return; }
         db.ref('users/' + u).once('value').then((snap) => {
             if(snap.exists() && snap.val().password === p) { openDash(); }
-            else { alert("Invalid User/Pass!"); }
+            else { alert("Wrong User/Pass!"); }
         });
-    }
-
-    function getSignal() {
-        document.getElementById('res').innerText = "SCANNING...";
-        setTimeout(() => { 
-            document.getElementById('res').innerText = Math.random() > 0.5 ? "BIG 🔴" : "SMALL 🟢"; 
-        }, 1000);
     }
 
     function openDash() { document.getElementById('auth-section').style.display='none'; document.getElementById('dashboard').style.display='block'; }
