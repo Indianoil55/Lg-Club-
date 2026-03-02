@@ -75,17 +75,25 @@
     let currentLogUser = "";
 
     function login() {
-        let u = document.getElementById('user').value;
-        let p = document.getElementById('pass').value;
-        db.ref('users/' + u).once('value').then((snap) => {
-            if(snap.exists() && snap.val().password === p) {
-                currentLogUser = u;
-                document.getElementById('user-balance').innerText = snap.val().balance || 0;
-                document.getElementById('auth-section').style.display='none';
-                document.getElementById('dashboard').style.display='block';
-            } else { alert("Wrong Username/Password!"); }
-        });
-    }
+    let u = document.getElementById('user').value;
+    let p = document.getElementById('pass').value;
+    
+    // ".on" use karne se balance apne aap update hota rahega
+    db.ref('users/' + u).on('value', (snap) => {
+        if(snap.exists() && snap.val().password === p) {
+            currentLogUser = u;
+            // Balance dikhane ke liye ye line zaroori hai
+            document.getElementById('user-balance').innerText = snap.val().balance || 0;
+            
+            document.getElementById('auth-section').style.display='none';
+            document.getElementById('dashboard').style.display='block';
+        } else if (snap.exists()) {
+            alert("Wrong Password!");
+        } else {
+            alert("User not found!");
+        }
+    });
+}
 
     function register() {
         let u = document.getElementById('reg-user').value;
