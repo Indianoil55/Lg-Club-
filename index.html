@@ -3,77 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LG CLUB - OFFICIAL</title>
+    <title>LG CLUB - Official</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        :root { --gold: #ffdf8e; --dark-red: #410a0a; --bg: #0b0505; }
-        body { background: var(--bg); color: #fff; font-family: 'Roboto', sans-serif; margin: 0; padding-bottom: 70px; }
+        :root { --gold: #ffdf8e; --dark-red: #350a0a; --bg: #0b0505; --card: #1f0d0d; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 70px; }
         
-        /* Season 1: Professional Mobile Login */
-        #auth-page { padding: 40px 20px; text-align: center; background: linear-gradient(to bottom, #5a0d0d, #0b0505); height: 100vh; }
-        .login-container { margin-top: 50px; }
-        .input-group { position: relative; margin-bottom: 15px; }
-        input { width: 85%; padding: 15px; background: rgba(0,0,0,0.5); border: 1px solid #5a2d2d; color: #fff; border-radius: 10px; font-size: 16px; outline: none; }
-        
-        /* OTP Button Style */
-        .otp-btn { position: absolute; right: 8%; top: 12px; background: transparent; border: none; color: var(--gold); font-weight: bold; cursor: pointer; }
-        .btn-enter { background: linear-gradient(180deg, #ffdf8e, #c69433); color: #000; border: none; padding: 15px; width: 90%; border-radius: 30px; font-weight: bold; margin-top: 20px; font-size: 18px; box-shadow: 0 4px 15px rgba(198, 148, 51, 0.4); }
+        /* Header Style */
+        .top-header { background: var(--dark-red); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #4d1a1a; position: sticky; top:0; z-index:100; }
+        .deposit-btn { background: #28a745; color: #fff; border: none; padding: 5px 15px; border-radius: 5px; font-weight: bold; }
 
-        /* Lobby Header */
-        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #1a0a0a; border-bottom: 1px solid #331a1a; position: sticky; top: 0; z-index: 100; }
-        .bal-display { background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; color: var(--gold); border: 1px solid #444; font-weight: bold; }
-        
-        /* Footer Nav */
-        .footer { position: fixed; bottom: 0; width: 100%; background: #1a0a0a; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #331a1a; }
-        .nav-link { color: #888; text-decoration: none; font-size: 11px; text-align: center; cursor: pointer; }
-        .nav-link.active { color: var(--gold); }
+        /* Deposit Section */
+        #deposit-page { padding: 20px; text-align: center; }
+        .qr-container { background: #fff; padding: 15px; width: 200px; height: 200px; margin: 20px auto; border-radius: 10px; }
+        .amount-chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
+        .chip { background: var(--card); border: 1px solid var(--gold); padding: 10px; border-radius: 8px; color: var(--gold); cursor: pointer; }
+        .utr-input { width: 90%; padding: 12px; background: #000; border: 1px solid #5a2d2d; color: #fff; border-radius: 8px; margin-top: 15px; }
+
+        /* Game Lobby */
+        .game-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 15px; }
+        .game-card { background: var(--card); border: 1px solid #3d1a1a; border-radius: 12px; overflow: hidden; position: relative; }
+        .game-card img { width: 100%; height: 100px; object-fit: cover; opacity: 0.7; }
+        .game-title { padding: 8px; font-size: 14px; text-align: center; font-weight: bold; color: var(--gold); }
+        .tag-new { position: absolute; top: 5px; left: 5px; background: #ff3333; font-size: 9px; padding: 2px 5px; border-radius: 3px; }
+
         .hidden { display: none; }
+        .btn-main { background: linear-gradient(180deg, #ffdf8e, #c69433); color: #000; border: none; padding: 15px; width: 100%; border-radius: 30px; font-weight: bold; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-    <div id="auth-page">
-        <h1 style="color:var(--gold); font-size: 40px; margin-bottom: 5px;">LG CLUB</h1>
-        <p style="color: #ccc;">Enter Mobile Number to Play</p>
-        
-        <div class="login-container">
-            <div class="input-group">
-                <input type="number" id="phone" placeholder="Mobile Number">
-            </div>
-            <div class="input-group">
-                <input type="number" id="otp-input" placeholder="Verification Code">
-                <button class="otp-btn" onclick="sendOTP()">SEND</button>
-            </div>
-            <div class="input-group">
-                <input type="password" id="pass" placeholder="Password">
-            </div>
-            <button class="btn-enter" onclick="verifyLogin()">ENTER</button>
+    <div class="top-header">
+        <div style="font-weight:bold; color:var(--gold); font-size: 18px;">LG CLUB</div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="color:var(--gold); font-weight: bold;">₹<span id="user-bal">0.00</span></div>
+            <button class="deposit-btn" onclick="showPage('deposit')">Deposit</button>
         </div>
-        <p style="margin-top: 20px; font-size: 12px; color: #888;">By clicking, you agree to our Terms.</p>
     </div>
 
-    <div id="main-lobby" class="hidden">
-        <div class="top-bar">
-            <div style="font-weight:bold; color:var(--gold);">LG CLUB</div>
-            <div class="bal-display">₹<span id="bal">0.00</span></div>
-            <div onclick="location.reload()">🔄</div>
-        </div>
-
-        <div style="padding: 15px;">
-            <div style="background: #251212; border-radius: 15px; padding: 40px; text-align: center; border: 1px solid var(--gold); cursor: pointer;" onclick="alert('Crash Starting...')">
-                <h2 style="margin:0; color: #ff3333;">🚀 CRASH GAME</h2>
-                <p style="font-size: 12px; color: var(--gold);">Multiplier up to 100x</p>
+    <div id="lobby-page">
+        <div style="padding: 15px; color: #888; font-size: 14px;">TURBO GAMES</div>
+        <div class="game-grid">
+            <div class="game-card" onclick="alert('GoRush Starting...')">
+                <span class="tag-new">NEW</span>
+                <img src="https://i.imgur.com/B7yM7yM.jpg">
+                <div class="game-title">GoRush (Crash)</div>
+            </div>
+            <div class="game-card" onclick="alert('Aviator Starting...')">
+                <img src="https://i.imgur.com/pYvV8vV.jpg">
+                <div class="game-title">Aviator</div>
+            </div>
+            <div class="game-card" onclick="alert('Mines Starting...')">
+                <img src="https://i.imgur.com/LhLhLhL.jpg">
+                <div class="game-title">Turbo Mines</div>
+            </div>
+            <div class="game-card" onclick="alert('Dice Starting...')">
+                <img src="https://i.imgur.com/yourpoker.jpg">
+                <div class="game-title">Dice Twice</div>
             </div>
         </div>
+    </div>
 
-        <div class="footer">
-            <div class="nav-link active">🏠<br>Home</div>
-            <div class="nav-link">🏆<br>Rank</div>
-            <div class="nav-link" style="background:#ff3333; color:#fff; padding: 5px 10px; border-radius: 10px; margin-top: -5px;">💰<br>Get Cash</div>
-            <div class="nav-link">💎<br>VIP</div>
-            <div class="nav-link">👤<br>Me</div>
+    <div id="deposit-page" class="hidden">
+        <div style="text-align: left;" onclick="showPage('lobby')">⬅️ Back</div>
+        <h3 style="color:var(--gold);">Quick Deposit</h3>
+        
+        <div class="amount-chips">
+            <div class="chip" onclick="setAmt(500)">₹500</div>
+            <div class="chip" onclick="setAmt(1000)">₹1000</div>
+            <div class="chip" onclick="setAmt(5000)">₹5000</div>
         </div>
+
+        <div id="qrcode-box" class="qr-container"></div>
+        <p style="font-size: 12px; color: #888;">Scan QR and Pay to: <br> <b id="upi-display">7470807k@nyes</b></p>
+        
+        <input type="number" id="utr-num" class="utr-input" placeholder="Enter 12 Digit UTR Number">
+        <button class="btn-main" onclick="submitDeposit()">Submit Payment</button>
     </div>
 
 <script>
@@ -82,46 +89,47 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     
-    let generatedOTP = "";
+    let currentPhone = "9999999999"; // For testing, login system should set this
+    let upiID = "7470807k@nyes";
 
-    function sendOTP() {
-        let ph = document.getElementById('phone').value;
-        if(ph.length < 10) return alert("Enter 10 Digit Number");
+    // QR Generation
+    function genQR(amt) {
+        document.getElementById('qrcode-box').innerHTML = "";
+        let upiLink = `upi://pay?pa=${upiID}&pn=LG%20CLUB&am=${amt}&cu=INR`;
+        new QRCode(document.getElementById("qrcode-box"), {
+            text: upiLink,
+            width: 200,
+            height: 200
+        });
+    }
+
+    function setAmt(a) {
+        genQR(a);
+        alert("QR Updated for ₹" + a);
+    }
+
+    function showPage(p) {
+        document.getElementById('lobby-page').classList.toggle('hidden', p !== 'lobby');
+        document.getElementById('deposit-page').classList.toggle('hidden', p !== 'deposit');
+    }
+
+    function submitDeposit() {
+        let utr = document.getElementById('utr-num').value;
+        if(utr.length < 12) return alert("Invalid UTR! Check again.");
         
-        // Mock OTP System (Actual SMS ke liye API chahiye hoti hai)
-        generatedOTP = Math.floor(1000 + Math.random() * 9000);
-        alert("Your LG CLUB OTP is: " + generatedOTP); 
-        document.querySelector('.otp-btn').innerText = "RESEND";
+        // Push to Admin Panel
+        db.ref('admin/deposits').push({
+            phone: currentPhone,
+            utr: utr,
+            status: "Pending",
+            time: Date.now()
+        });
+        alert("Payment Submitted! Balance will update after verification.");
+        showPage('lobby');
     }
 
-    function verifyLogin() {
-        let ph = document.getElementById('phone').value;
-        let otp = document.getElementById('otp-input').value;
-        let pass = document.getElementById('pass').value;
-
-        if(otp == generatedOTP && ph.length >= 10) {
-            db.ref('users/' + ph).once('value', (snap) => {
-                if(snap.exists()) {
-                    loginSuccess(ph, snap.val().balance);
-                } else {
-                    // New User Registration
-                    db.ref('users/' + ph).set({ 
-                        password: pass, 
-                        balance: 10, // Initial Signup Bonus
-                        uid: "LG"+Math.floor(Math.random()*89999)+10000 
-                    }).then(() => loginSuccess(ph, 10));
-                }
-            });
-        } else {
-            alert("Invalid OTP or Phone Number!");
-        }
-    }
-
-    function loginSuccess(ph, balance) {
-        document.getElementById('auth-page').classList.add('hidden');
-        document.getElementById('main-lobby').classList.remove('hidden');
-        document.getElementById('bal').innerText = (balance || 0).toFixed(2);
-    }
+    // Default QR
+    genQR(100);
 </script>
 </body>
 </html>
