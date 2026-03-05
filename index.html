@@ -3,92 +3,369 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LG CLUB - Official</title>
+    <title>LG CLUB - PRO EDITION</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        :root { --gold: #ffdf8e; --dark-red: #350a0a; --bg: #0b0505; --card: #1f0d0d; }
-        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding-bottom: 70px; overflow-x: hidden; }
+        :root { --gold: #ffdf8e; --red: #ff4444; --dark: #0b0505; --card: #1f0d0d; }
+        body { background: var(--dark); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; user-select: none; }
         
-        /* Navigation & Header */
-        .top-header { background: var(--dark-red); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #4d1a1a; position: sticky; top:0; z-index:100; }
-        .bal-box { background: rgba(0,0,0,0.4); padding: 5px 12px; border-radius: 20px; border: 1px solid var(--gold); color: var(--gold); font-weight: bold; }
+        /* Top Bar [Reference: PDF Page 1] */
+        .header { background: #350a0a; padding: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); }
+        .bal-container { background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 20px; border: 1px solid var(--gold); color: var(--gold); font-weight: bold; }
 
-        /* Login Screen */
-        #auth-page { padding: 40px 20px; text-align: center; background: linear-gradient(to bottom, #5a0d0d, #0b0505); height: 100vh; position: fixed; width: 100%; top: 0; z-index: 200; }
-        .input-group { margin-bottom: 15px; position: relative; }
-        input { width: 85%; padding: 15px; background: rgba(0,0,0,0.5); border: 1px solid #5a2d2d; color: #fff; border-radius: 10px; font-size: 16px; outline: none; }
-        .btn-gold { background: linear-gradient(180deg, #ffdf8e, #c69433); color: #000; border: none; padding: 15px; width: 90%; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 18px; }
+        /* GoRush Live Engine [Reference: PDF Page 1] */
+        .game-area { padding: 15px; text-align: center; }
+        .crash-screen { background: radial-gradient(circle, #410a0a 0%, #000 100%); height: 220px; border-radius: 15px; border: 1px solid #4d1a1a; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
+        #multi-val { font-size: 55px; font-weight: 800; color: var(--gold); text-shadow: 0 0 20px rgba(255, 223, 142, 0.5); z-index: 5; }
+        .round-history { display: flex; gap: 5px; overflow-x: auto; padding: 10px 0; justify-content: center; }
+        .history-item { background: #331a1a; padding: 2px 8px; border-radius: 4px; font-size: 10px; border: 1px solid #5a2d2d; color: #ffdf8e; }
 
-        /* Deposit Page */
-        #deposit-page { padding: 20px; text-align: center; }
-        .qr-card { background: #fff; padding: 10px; width: 180px; height: 180px; margin: 20px auto; border-radius: 10px; }
-        .chip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
-        .chip { background: var(--card); border: 1px solid var(--gold); padding: 10px; border-radius: 8px; color: var(--gold); font-weight: bold; cursor: pointer; }
+        /* Betting Section [Reference: PDF Page 1 & 2] */
+        .bet-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; background: #1a0a0a; border-radius: 15px; margin: 10px; }
+        input[type="number"] { width: 80%; padding: 10px; background: #000; border: 1px solid #5a2d2d; color: var(--gold); border-radius: 8px; text-align: center; font-size: 18px; }
+        .btn-bet { background: linear-gradient(180deg, #ffdf8e, #c69433); color: #000; border: none; padding: 15px; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .btn-cashout { background: #28a745 !important; color: white !important; }
 
-        /* Game Grid [Reference: PDF Page 10] */
-        .game-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
-        .game-item { background: var(--card); border-radius: 12px; border: 1px solid #3d1a1a; overflow: hidden; position: relative; text-align: center; }
-        .game-item img { width: 100%; height: 90px; object-fit: cover; }
-        .game-item p { margin: 5px 0; font-size: 13px; font-weight: bold; color: var(--gold); }
-        .new-tag { position: absolute; top: 5px; left: 5px; background: red; font-size: 10px; padding: 2px 6px; border-radius: 4px; }
+        /* Turbo Games Grid [Reference: PDF Page 10] */
+        .grid-title { padding-left: 20px; color: #888; font-size: 12px; text-transform: uppercase; }
+        .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
+        .game-card { background: var(--card); border-radius: 10px; padding: 10px; text-align: center; border: 1px solid #3d1a1a; position: relative; }
+        .game-card img { width: 100%; border-radius: 5px; margin-bottom: 5px; }
+        .game-name { font-size: 10px; font-weight: bold; color: #ccc; }
+        .new-tag { position: absolute; top: 3px; left: 3px; background: red; font-size: 7px; padding: 1px 4px; border-radius: 2px; }
 
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="auth-page">
-        <h1 style="color:var(--gold); font-size: 45px; margin-bottom: 10px;">LG CLUB</h1>
-        <p style="color: #ccc;">Secure Login with Mobile</p>
-        <div class="input-group" style="margin-top: 50px;">
-            <input type="number" id="login-phone" placeholder="Mobile Number">
-        </div>
-        <div class="input-group">
-            <input type="number" id="login-otp" placeholder="Enter OTP">
-            <button onclick="sendFakeOTP()" style="position: absolute; right: 10%; top: 15px; background: none; border: none; color: var(--gold); font-weight: bold;">SEND</button>
-        </div>
-        <button class="btn-gold" onclick="doLogin()">START PLAYING</button>
+    <div class="header">
+        <div style="font-weight:bold; letter-spacing:1px; color: var(--gold);">LG CLUB</div>
+        <div class="bal-container">₹<span id="balance">10.00</span></div>
+        <button style="background: #28a745; border:none; color:#fff; border-radius:5px; padding: 5px 10px;" onclick="location.reload()">Deposit</button>
     </div>
 
-    <div id="main-app" class="hidden">
-        <div class="top-header">
-            <div style="font-weight:bold; color:var(--gold); font-size: 20px;">LG CLUB</div>
-            <div class="bal-box">₹<span id="bal-val">0.00</span></div>
+    <div class="game-area">
+        <div class="round-history" id="history-box">
+            </div>
+        
+        <div class="crash-screen">
+            <div id="status-text" style="color:#888; font-size:12px; margin-bottom:10px;">Waiting for next round...</div>
+            <div id="multi-val">1.00x</div>
+            <div id="rocket" style="font-size:30px; transition: 0.1s;">🚀</div>
         </div>
 
-        <div style="padding: 15px;">
-            <div style="background: #251212; border: 1px solid var(--gold); border-radius: 15px; padding: 20px; text-align: center; position: relative;">
-                <h2 style="margin: 0; color: #ff4444;">🚀 GORUSH LIVE</h2>
-                <div id="multiplier" style="font-size: 40px; color: var(--gold); margin: 15px 0;">1.00x</div>
-                <button class="btn-gold" style="width: 80%;" onclick="alert('Bet Placed!')">PLACE BET</button>
+        <div class="bet-controls">
+            <div>
+                <span style="font-size:10px; color:#888;">AMOUNT</span><br>
+                <input type="number" id="bet-amount" value="10">
             </div>
-        </div>
-
-        <div class="game-grid">
-            <div class="game-item" onclick="showPage('deposit')">
-                <span class="new-tag">HOT</span>
-                <img src="https://i.imgur.com/B7yM7yM.jpg">
-                <p>Deposit Cash</p>
-            </div>
-            <div class="game-item">
-                <img src="https://i.imgur.com/LhLhLhL.jpg">
-                <p>Turbo Mines</p>
-            </div>
-            <div class="game-item">
-                <img src="https://i.imgur.com/pYvV8vV.jpg">
-                <p>Aviator</p>
-            </div>
-            <div class="game-item">
-                <img src="https://i.imgur.com/yourpoker.jpg">
-                <p>Crystal Poker</p>
-            </div>
+            <button id="main-action-btn" class="btn-bet" onclick="handleAction()">BET</button>
         </div>
     </div>
 
-    <div id="deposit-page" class="hidden" style="padding: 20px; text-align: center;">
-        <button onclick="showPage('lobby')" style="float: left; background: none; border: none; color: white; font-size: 20px;">⬅️</button>
-        <h2 style="color:var(--gold);">Add Cash</h2>
-        <div class="chip-grid">
-            <div class="chip" onclick="update
+    <p class="grid-title">Turbo Games</p>
+    <div class="game-grid">
+        <div class="game-card">
+            <span class="new-tag">NEW</span>
+            <img src="https://i.imgur.com/B7yM7yM.jpg" alt="Mines">
+            <div class="game-name">Turbo Mines</div>
+        </div>
+        <div class="game-card">
+            <img src="https://i.imgur.com/pYvV8vV.jpg" alt="Aviator">
+            <div class="game-name">Aviator</div>
+        </div>
+        <div class="game-card">
+            <img src="https://i.imgur.com/yourpoker.jpg" alt="Dice">
+            <div class="game-name">Dice Twice</div>
+        </div>
+    </div>
+
+<script>
+    // Game State
+    let balance = 10.00;
+    let multiplier = 1.00;
+    let isRunning = false;
+    let hasBet = false;
+    let gameLoop;
+    let crashPoint = 0;
+
+    function updateBalance(amt) {
+        balance += amt;
+        document.getElementById('balance').innerText = balance.toFixed(2);
+    }
+
+    function handleAction() {
+        const btn = document.getElementById('main-action-btn');
+        const betInput = document.getElementById('bet-amount');
+        let amount = parseFloat(betInput.value);
+
+        if (!isRunning && !hasBet) {
+            // Place Bet
+            if (amount > balance) return alert("Low Balance!");
+            updateBalance(-amount);
+            hasBet = true;
+            btn.innerText = "WAITING...";
+            btn.style.opacity = "0.6";
+            prepareGame();
+        } else if (isRunning && hasBet) {
+            // Cash Out
+            let winAmt = amount * multiplier;
+            updateBalance(winAmt);
+            hasBet = false;
+            btn.innerText = "WIN: ₹" + winAmt.toFixed(2);
+            btn.classList.add('btn-cashout');
+            setTimeout(() => {
+                btn.classList.remove('btn-cashout');
+                btn.innerText = "BET";
+            }, 2000);
+        }
+    }
+
+    function prepareGame() {
+        document.getElementById('status-text').innerText = "Game Starting in 3s...";
+        setTimeout(startGame, 3000);
+    }
+
+    function startGame() {
+        isRunning = true;
+        multiplier = 1.00;
+        crashPoint = (Math.random() * 5 + 1.1).toFixed(2); // Random crash between 1.1 and 6.1
+        const btn = document.getElementById('main-action-btn');
+        
+        if(hasBet) {
+            btn.innerText = "CASH OUT";
+            btn.style.opacity = "1";
+        }
+
+        document.getElementById('status-text').innerText = "LIVE";
+        
+        gameLoop = setInterval(() => {
+            multiplier += 0.01;
+            document.getElementById('multi-val').innerText = multiplier.toFixed(2) + "x";
+            
+            // Rocket animation
+            document.getElementById('rocket').style.transform = `translateY(-${(multiplier-1)*20}px) translateX(${(multiplier-1)*10}px)`;
+
+            if (multiplier >= crashPoint) {
+                crashGame();
+            }
+        }, 100);
+    }
+
+    function crashGame() {
+        clearInterval(gameLoop);
+        isRunning = false;
+        document.getElementById('multi-val').style.color = "var(--red)";
+        document.getElementById('status-text').innerText = "CRASHED @ " + crashPoint + "x";
+        
+        // Add to history [PDF Page 2 style]
+        const hist = document.getElementById('history-box');
+        hist.innerHTML = `<div class="history-item">${crashPoint}x</div>` + hist.innerHTML;
+
+        const btn = document.getElementById('main-action-btn');
+        if (hasBet) {
+            btn.innerText = "LOST!";
+            hasBet = false;
+        }
+        
+        setTimeout(() => {
+            document.getElementById('multi-val').innerText = "1.00x";
+            document.getElementById('multi-val').style.color = "var(--gold)";
+            document.getElementById('rocket').style.transform = `translate(0,0)`;
+            btn.innerText = "BET";
+            prepareGame();
+        }, 3000);
+    }
+
+    // Initial Start
+    prepareGame();
+</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LG CLUB - PRO EDITION</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        :root { --gold: #ffdf8e; --red: #ff4444; --dark: #0b0505; --card: #1f0d0d; }
+        body { background: var(--dark); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; user-select: none; }
+        
+        /* Top Bar [Reference: PDF Page 1] */
+        .header { background: #350a0a; padding: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); }
+        .bal-container { background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 20px; border: 1px solid var(--gold); color: var(--gold); font-weight: bold; }
+
+        /* GoRush Live Engine [Reference: PDF Page 1] */
+        .game-area { padding: 15px; text-align: center; }
+        .crash-screen { background: radial-gradient(circle, #410a0a 0%, #000 100%); height: 220px; border-radius: 15px; border: 1px solid #4d1a1a; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
+        #multi-val { font-size: 55px; font-weight: 800; color: var(--gold); text-shadow: 0 0 20px rgba(255, 223, 142, 0.5); z-index: 5; }
+        .round-history { display: flex; gap: 5px; overflow-x: auto; padding: 10px 0; justify-content: center; }
+        .history-item { background: #331a1a; padding: 2px 8px; border-radius: 4px; font-size: 10px; border: 1px solid #5a2d2d; color: #ffdf8e; }
+
+        /* Betting Section [Reference: PDF Page 1 & 2] */
+        .bet-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; background: #1a0a0a; border-radius: 15px; margin: 10px; }
+        input[type="number"] { width: 80%; padding: 10px; background: #000; border: 1px solid #5a2d2d; color: var(--gold); border-radius: 8px; text-align: center; font-size: 18px; }
+        .btn-bet { background: linear-gradient(180deg, #ffdf8e, #c69433); color: #000; border: none; padding: 15px; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .btn-cashout { background: #28a745 !important; color: white !important; }
+
+        /* Turbo Games Grid [Reference: PDF Page 10] */
+        .grid-title { padding-left: 20px; color: #888; font-size: 12px; text-transform: uppercase; }
+        .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
+        .game-card { background: var(--card); border-radius: 10px; padding: 10px; text-align: center; border: 1px solid #3d1a1a; position: relative; }
+        .game-card img { width: 100%; border-radius: 5px; margin-bottom: 5px; }
+        .game-name { font-size: 10px; font-weight: bold; color: #ccc; }
+        .new-tag { position: absolute; top: 3px; left: 3px; background: red; font-size: 7px; padding: 1px 4px; border-radius: 2px; }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div style="font-weight:bold; letter-spacing:1px; color: var(--gold);">LG CLUB</div>
+        <div class="bal-container">₹<span id="balance">10.00</span></div>
+        <button style="background: #28a745; border:none; color:#fff; border-radius:5px; padding: 5px 10px;" onclick="location.reload()">Deposit</button>
+    </div>
+
+    <div class="game-area">
+        <div class="round-history" id="history-box">
+            </div>
+        
+        <div class="crash-screen">
+            <div id="status-text" style="color:#888; font-size:12px; margin-bottom:10px;">Waiting for next round...</div>
+            <div id="multi-val">1.00x</div>
+            <div id="rocket" style="font-size:30px; transition: 0.1s;">🚀</div>
+        </div>
+
+        <div class="bet-controls">
+            <div>
+                <span style="font-size:10px; color:#888;">AMOUNT</span><br>
+                <input type="number" id="bet-amount" value="10">
+            </div>
+            <button id="main-action-btn" class="btn-bet" onclick="handleAction()">BET</button>
+        </div>
+    </div>
+
+    <p class="grid-title">Turbo Games</p>
+    <div class="game-grid">
+        <div class="game-card">
+            <span class="new-tag">NEW</span>
+            <img src="https://i.imgur.com/B7yM7yM.jpg" alt="Mines">
+            <div class="game-name">Turbo Mines</div>
+        </div>
+        <div class="game-card">
+            <img src="https://i.imgur.com/pYvV8vV.jpg" alt="Aviator">
+            <div class="game-name">Aviator</div>
+        </div>
+        <div class="game-card">
+            <img src="https://i.imgur.com/yourpoker.jpg" alt="Dice">
+            <div class="game-name">Dice Twice</div>
+        </div>
+    </div>
+
+<script>
+    // Game State
+    let balance = 10.00;
+    let multiplier = 1.00;
+    let isRunning = false;
+    let hasBet = false;
+    let gameLoop;
+    let crashPoint = 0;
+
+    function updateBalance(amt) {
+        balance += amt;
+        document.getElementById('balance').innerText = balance.toFixed(2);
+    }
+
+    function handleAction() {
+        const btn = document.getElementById('main-action-btn');
+        const betInput = document.getElementById('bet-amount');
+        let amount = parseFloat(betInput.value);
+
+        if (!isRunning && !hasBet) {
+            // Place Bet
+            if (amount > balance) return alert("Low Balance!");
+            updateBalance(-amount);
+            hasBet = true;
+            btn.innerText = "WAITING...";
+            btn.style.opacity = "0.6";
+            prepareGame();
+        } else if (isRunning && hasBet) {
+            // Cash Out
+            let winAmt = amount * multiplier;
+            updateBalance(winAmt);
+            hasBet = false;
+            btn.innerText = "WIN: ₹" + winAmt.toFixed(2);
+            btn.classList.add('btn-cashout');
+            setTimeout(() => {
+                btn.classList.remove('btn-cashout');
+                btn.innerText = "BET";
+            }, 2000);
+        }
+    }
+
+    function prepareGame() {
+        document.getElementById('status-text').innerText = "Game Starting in 3s...";
+        setTimeout(startGame, 3000);
+    }
+
+    function startGame() {
+        isRunning = true;
+        multiplier = 1.00;
+        crashPoint = (Math.random() * 5 + 1.1).toFixed(2); // Random crash between 1.1 and 6.1
+        const btn = document.getElementById('main-action-btn');
+        
+        if(hasBet) {
+            btn.innerText = "CASH OUT";
+            btn.style.opacity = "1";
+        }
+
+        document.getElementById('status-text').innerText = "LIVE";
+        
+        gameLoop = setInterval(() => {
+            multiplier += 0.01;
+            document.getElementById('multi-val').innerText = multiplier.toFixed(2) + "x";
+            
+            // Rocket animation
+            document.getElementById('rocket').style.transform = `translateY(-${(multiplier-1)*20}px) translateX(${(multiplier-1)*10}px)`;
+
+            if (multiplier >= crashPoint) {
+                crashGame();
+            }
+        }, 100);
+    }
+
+    function crashGame() {
+        clearInterval(gameLoop);
+        isRunning = false;
+        document.getElementById('multi-val').style.color = "var(--red)";
+        document.getElementById('status-text').innerText = "CRASHED @ " + crashPoint + "x";
+        
+        // Add to history [PDF Page 2 style]
+        const hist = document.getElementById('history-box');
+        hist.innerHTML = `<div class="history-item">${crashPoint}x</div>` + hist.innerHTML;
+
+        const btn = document.getElementById('main-action-btn');
+        if (hasBet) {
+            btn.innerText = "LOST!";
+            hasBet = false;
+        }
+        
+        setTimeout(() => {
+            document.getElementById('multi-val').innerText = "1.00x";
+            document.getElementById('multi-val').style.color = "var(--gold)";
+            document.getElementById('rocket').style.transform = `translate(0,0)`;
+            btn.innerText = "BET";
+            prepareGame();
+        }, 3000);
+    }
+
+    // Initial Start
+    prepareGame();
+</script>
+</body>
+        </html>
