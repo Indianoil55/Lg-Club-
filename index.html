@@ -1,4 +1,4 @@
-TYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -9,127 +9,86 @@ TYPE html>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root { --gold: #ffdf8e; --dark-red: #350a0a; --bg: #0b0505; --card: #1f0d0d; }
-        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 70px; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding-bottom: 70px; overflow-x: hidden; }
         
-        /* Header Style */
+        /* Navigation & Header */
         .top-header { background: var(--dark-red); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #4d1a1a; position: sticky; top:0; z-index:100; }
-        .deposit-btn { background: #28a745; color: #fff; border: none; padding: 5px 15px; border-radius: 5px; font-weight: bold; }
+        .bal-box { background: rgba(0,0,0,0.4); padding: 5px 12px; border-radius: 20px; border: 1px solid var(--gold); color: var(--gold); font-weight: bold; }
 
-        /* Deposit Section */
+        /* Login Screen */
+        #auth-page { padding: 40px 20px; text-align: center; background: linear-gradient(to bottom, #5a0d0d, #0b0505); height: 100vh; position: fixed; width: 100%; top: 0; z-index: 200; }
+        .input-group { margin-bottom: 15px; position: relative; }
+        input { width: 85%; padding: 15px; background: rgba(0,0,0,0.5); border: 1px solid #5a2d2d; color: #fff; border-radius: 10px; font-size: 16px; outline: none; }
+        .btn-gold { background: linear-gradient(180deg, #ffdf8e, #c69433); color: #000; border: none; padding: 15px; width: 90%; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 18px; }
+
+        /* Deposit Page */
         #deposit-page { padding: 20px; text-align: center; }
-        .qr-container { background: #fff; padding: 15px; width: 200px; height: 200px; margin: 20px auto; border-radius: 10px; }
-        .amount-chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
-        .chip { background: var(--card); border: 1px solid var(--gold); padding: 10px; border-radius: 8px; color: var(--gold); cursor: pointer; }
-        .utr-input { width: 90%; padding: 12px; background: #000; border: 1px solid #5a2d2d; color: #fff; border-radius: 8px; margin-top: 15px; }
+        .qr-card { background: #fff; padding: 10px; width: 180px; height: 180px; margin: 20px auto; border-radius: 10px; }
+        .chip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
+        .chip { background: var(--card); border: 1px solid var(--gold); padding: 10px; border-radius: 8px; color: var(--gold); font-weight: bold; cursor: pointer; }
 
-        /* Game Lobby */
-        .game-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 15px; }
-        .game-card { background: var(--card); border: 1px solid #3d1a1a; border-radius: 12px; overflow: hidden; position: relative; }
-        .game-card img { width: 100%; height: 100px; object-fit: cover; opacity: 0.7; }
-        .game-title { padding: 8px; font-size: 14px; text-align: center; font-weight: bold; color: var(--gold); }
-        .tag-new { position: absolute; top: 5px; left: 5px; background: #ff3333; font-size: 9px; padding: 2px 5px; border-radius: 3px; }
+        /* Game Grid [Reference: PDF Page 10] */
+        .game-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
+        .game-item { background: var(--card); border-radius: 12px; border: 1px solid #3d1a1a; overflow: hidden; position: relative; text-align: center; }
+        .game-item img { width: 100%; height: 90px; object-fit: cover; }
+        .game-item p { margin: 5px 0; font-size: 13px; font-weight: bold; color: var(--gold); }
+        .new-tag { position: absolute; top: 5px; left: 5px; background: red; font-size: 10px; padding: 2px 6px; border-radius: 4px; }
 
         .hidden { display: none; }
-        .btn-main { background: linear-gradient(180deg, #ffdf8e, #c69433); color: #000; border: none; padding: 15px; width: 100%; border-radius: 30px; font-weight: bold; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-    <div class="top-header">
-        <div style="font-weight:bold; color:var(--gold); font-size: 18px;">LG CLUB</div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="color:var(--gold); font-weight: bold;">₹<span id="user-bal">0.00</span></div>
-            <button class="deposit-btn" onclick="showPage('deposit')">Deposit</button>
+    <div id="auth-page">
+        <h1 style="color:var(--gold); font-size: 45px; margin-bottom: 10px;">LG CLUB</h1>
+        <p style="color: #ccc;">Secure Login with Mobile</p>
+        <div class="input-group" style="margin-top: 50px;">
+            <input type="number" id="login-phone" placeholder="Mobile Number">
         </div>
+        <div class="input-group">
+            <input type="number" id="login-otp" placeholder="Enter OTP">
+            <button onclick="sendFakeOTP()" style="position: absolute; right: 10%; top: 15px; background: none; border: none; color: var(--gold); font-weight: bold;">SEND</button>
+        </div>
+        <button class="btn-gold" onclick="doLogin()">START PLAYING</button>
     </div>
 
-    <div id="lobby-page">
-        <div style="padding: 15px; color: #888; font-size: 14px;">TURBO GAMES</div>
+    <div id="main-app" class="hidden">
+        <div class="top-header">
+            <div style="font-weight:bold; color:var(--gold); font-size: 20px;">LG CLUB</div>
+            <div class="bal-box">₹<span id="bal-val">0.00</span></div>
+        </div>
+
+        <div style="padding: 15px;">
+            <div style="background: #251212; border: 1px solid var(--gold); border-radius: 15px; padding: 20px; text-align: center; position: relative;">
+                <h2 style="margin: 0; color: #ff4444;">🚀 GORUSH LIVE</h2>
+                <div id="multiplier" style="font-size: 40px; color: var(--gold); margin: 15px 0;">1.00x</div>
+                <button class="btn-gold" style="width: 80%;" onclick="alert('Bet Placed!')">PLACE BET</button>
+            </div>
+        </div>
+
         <div class="game-grid">
-            <div class="game-card" onclick="alert('GoRush Starting...')">
-                <span class="tag-new">NEW</span>
+            <div class="game-item" onclick="showPage('deposit')">
+                <span class="new-tag">HOT</span>
                 <img src="https://i.imgur.com/B7yM7yM.jpg">
-                <div class="game-title">GoRush (Crash)</div>
+                <p>Deposit Cash</p>
             </div>
-            <div class="game-card" onclick="alert('Aviator Starting...')">
-                <img src="https://i.imgur.com/pYvV8vV.jpg">
-                <div class="game-title">Aviator</div>
-            </div>
-            <div class="game-card" onclick="alert('Mines Starting...')">
+            <div class="game-item">
                 <img src="https://i.imgur.com/LhLhLhL.jpg">
-                <div class="game-title">Turbo Mines</div>
+                <p>Turbo Mines</p>
             </div>
-            <div class="game-card" onclick="alert('Dice Starting...')">
+            <div class="game-item">
+                <img src="https://i.imgur.com/pYvV8vV.jpg">
+                <p>Aviator</p>
+            </div>
+            <div class="game-item">
                 <img src="https://i.imgur.com/yourpoker.jpg">
-                <div class="game-title">Dice Twice</div>
+                <p>Crystal Poker</p>
             </div>
         </div>
     </div>
 
-    <div id="deposit-page" class="hidden">
-        <div style="text-align: left;" onclick="showPage('lobby')">⬅️ Back</div>
-        <h3 style="color:var(--gold);">Quick Deposit</h3>
-        
-        <div class="amount-chips">
-            <div class="chip" onclick="setAmt(500)">₹500</div>
-            <div class="chip" onclick="setAmt(1000)">₹1000</div>
-            <div class="chip" onclick="setAmt(5000)">₹5000</div>
-        </div>
-
-        <div id="qrcode-box" class="qr-container"></div>
-        <p style="font-size: 12px; color: #888;">Scan QR and Pay to: <br> <b id="upi-display">7470807k@nyes</b></p>
-        
-        <input type="number" id="utr-num" class="utr-input" placeholder="Enter 12 Digit UTR Number">
-        <button class="btn-main" onclick="submitDeposit()">Submit Payment</button>
-    </div>
-
-<script>
-    // Firebase Setup
-    const firebaseConfig = { databaseURL: "https://lg-club-db-default-rtdb.firebaseio.com/" };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    
-    let currentPhone = "9999999999"; // For testing, login system should set this
-    let upiID = "7470807k@nyes";
-
-    // QR Generation
-    function genQR(amt) {
-        document.getElementById('qrcode-box').innerHTML = "";
-        let upiLink = `upi://pay?pa=${upiID}&pn=LG%20CLUB&am=${amt}&cu=INR`;
-        new QRCode(document.getElementById("qrcode-box"), {
-            text: upiLink,
-            width: 200,
-            height: 200
-        });
-    }
-
-    function setAmt(a) {
-        genQR(a);
-        alert("QR Updated for ₹" + a);
-    }
-
-    function showPage(p) {
-        document.getElementById('lobby-page').classList.toggle('hidden', p !== 'lobby');
-        document.getElementById('deposit-page').classList.toggle('hidden', p !== 'deposit');
-    }
-
-    function submitDeposit() {
-        let utr = document.getElementById('utr-num').value;
-        if(utr.length < 12) return alert("Invalid UTR! Check again.");
-        
-        // Push to Admin Panel
-        db.ref('admin/deposits').push({
-            phone: currentPhone,
-            utr: utr,
-            status: "Pending",
-            time: Date.now()
-        });
-        alert("Payment Submitted! Balance will update after verification.");
-        showPage('lobby');
-    }
-
-    // Default QR
-    genQR(100);
-</script>
-</body>
-</html
+    <div id="deposit-page" class="hidden" style="padding: 20px; text-align: center;">
+        <button onclick="showPage('lobby')" style="float: left; background: none; border: none; color: white; font-size: 20px;">⬅️</button>
+        <h2 style="color:var(--gold);">Add Cash</h2>
+        <div class="chip-grid">
+            <div class="chip" onclick="update
