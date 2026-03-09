@@ -3,39 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LG CLUB - Official</title>
+    <title>LG CLUB - Official Live</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root { --gold: #ffdf8e; --bg: #0b0505; --card: #1a0a0a; --red: #ff3333; --green: #28a745; }
-        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
+        body { background: var(--bg); color: #fff; font-family: sans-serif; margin: 0; padding-bottom: 20px; overflow-x: hidden;}
         
-        /* Header */
-        .header { background: #350a0a; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid var(--gold); position: sticky; top: 0; z-index: 1000; }
-        .bal-display { background: rgba(0,0,0,0.7); padding: 6px 15px; border-radius: 20px; border: 1px solid var(--gold); color: var(--gold); font-weight: 800; font-size: 14px; }
+        /* Header [PDF Page 1] */
+        .header { background: #350a0a; padding: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); position: sticky; top:0; z-index:100; }
+        .bal-badge { background: rgba(0,0,0,0.6); padding: 5px 15px; border-radius: 20px; border: 1px solid var(--gold); color: var(--gold); font-weight: bold; }
 
-        /* Multiplier History */
-        .history-strip { display: flex; gap: 8px; overflow-x: auto; padding: 10px; background: #130606; border-bottom: 1px solid #2d1111; scrollbar-width: none; }
-        .hist-chip { background: #2a1111; padding: 3px 12px; border-radius: 12px; font-size: 11px; font-weight: bold; color: var(--gold); border: 0.5px solid #4d1a1a; min-width: 45px; text-align: center; }
+        /* GORUSH (CRASH) */
+        .crash-screen { background: radial-gradient(circle, #5a0d0d 0%, #0b0505 100%); height: 180px; border-radius: 15px; border: 1.5px solid #4d1a1a; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; margin: 15px; }
+        #multi-val { font-size: 45px; font-weight: 900; color: var(--gold); z-index: 10; }
+        #rocket { position: absolute; bottom: 10px; left: 10px; width: 45px; transition: 0.1s linear; filter: drop-shadow(0 0 10px var(--red)); }
 
-        /* GoRush Crash Engine */
-        .game-canvas { padding: 15px; text-align: center; position: relative; }
-        .display-area { background: radial-gradient(circle, #5a0d0d 0%, #0b0505 100%); height: 240px; border-radius: 18px; border: 1.5px solid #4d1a1a; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 50px rgba(0,0,0,0.8); }
-        #multi-text { font-size: 65px; font-weight: 900; color: var(--gold); z-index: 10; text-shadow: 0 0 20px rgba(255, 223, 142, 0.4); }
-        .rocket-anim { position: absolute; bottom: 20px; left: 20px; width: 60px; transition: 0.1s linear; filter: drop-shadow(0 0 10px var(--red)); }
+        /* MINES GAME */
+        .mines-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 15px auto; max-width: 320px; }
+        .mine-box { width: 55px; height: 55px; background: #2d1111; border: 1px solid #4d1a1a; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; transition: 0.2s; }
+        .mine-box.open { background: #1a0a0a; border-color: var(--gold); }
 
-        /* Betting Section */
-        .bet-box { background: var(--card); padding: 20px; border-radius: 20px; margin: 15px; border: 1.5px solid #2d1111; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .amt-input { width: 100%; padding: 15px; background: #000; border: 1px solid #4d1a1a; color: var(--gold); border-radius: 12px; font-size: 22px; text-align: center; font-weight: bold; margin-bottom: 15px; outline: none; }
-        .btn-action { width: 100%; padding: 18px; border-radius: 15px; border: none; font-weight: 900; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; background: linear-gradient(180deg, #ffdf8e 0%, #c69433 100%); color: #350a0a; transition: 0.2s; }
-        .btn-cashout { background: linear-gradient(180deg, #28a745 0%, #1e7e34 100%) !important; color: #fff !important; box-shadow: 0 0 20px rgba(40, 167, 69, 0.4); }
+        /* UNIVERSAL CONTROLS */
+        .control-panel { background: var(--card); padding: 15px; border-radius: 15px; margin: 10px; border: 1px solid #3d1a1a; }
+        .input-paisa { width: 100%; padding: 12px; background: #000; border: 1px solid #5a2d2d; color: var(--gold); border-radius: 8px; font-size: 18px; text-align: center; margin-bottom: 10px; box-sizing: border-box; }
+        .btn-action { width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: bold; font-size: 18px; background: linear-gradient(180deg, #ffdf8e, #c69433); color: #000; cursor: pointer; }
+        .btn-cashout { background: linear-gradient(180deg, #28a745, #1e7e34) !important; color: white !important; }
 
-        /* Games Grid */
-        .section-label { padding: 0 20px; font-size: 12px; color: #777; font-weight: bold; text-transform: uppercase; }
-        .games-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 15px 20px; }
-        .game-item { background: var(--card); border-radius: 12px; padding: 10px; border: 1px solid #2d1111; text-align: center; position: relative; }
-        .game-item img { width: 100%; border-radius: 8px; margin-bottom: 8px; filter: contrast(1.1); }
-        .game-title { font-size: 10px; font-weight: bold; color: #aaa; }
-        .badge { position: absolute; top: 5px; right: 5px; background: var(--red); font-size: 8px; padding: 2px 6px; border-radius: 5px; font-weight: 800; }
+        /* GAME SWITCHER GRID */
+        .games-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
+        .game-card { background: var(--card); border-radius: 10px; padding: 8px; text-align: center; border: 1px solid #2d1111; font-size: 10px; cursor: pointer;}
+        .game-card img { width: 100%; border-radius: 5px; margin-bottom: 4px; }
 
         .hidden { display: none; }
     </style>
@@ -43,135 +40,147 @@
 <body>
 
     <div class="header">
-        <div style="font-weight:900; color: var(--gold); font-size: 22px; font-style: italic;">LG CLUB</div>
-        <div class="bal-display">₹<span id="bal-amt">10.00</span></div>
-        <button onclick="togglePay(true)" style="background: var(--green); color: #fff; border:none; padding: 7px 15px; border-radius: 8px; font-weight: bold; font-size: 12px;">DEPOSIT</button>
+        <div style="font-weight:900; color: var(--gold); font-size: 20px;">LG CLUB</div>
+        <div class="bal-badge">₹<span id="main-bal">10.00</span></div>
+        <button onclick="openDeposit()" style="background: var(--green); border:none; color:#fff; padding: 5px 12px; border-radius: 5px; font-weight: bold;">Deposit</button>
     </div>
 
-    <div class="history-strip" id="history-container">
-        <div class="hist-chip">1.22x</div>
-        <div class="hist-chip" style="color:#9c27b0">12.50x</div>
-        <div class="hist-chip">2.10x</div>
-        <div class="hist-chip" style="color:#ff3333">1.02x</div>
-    </div>
-
-    <div id="lobby">
-        <div class="game-canvas">
-            <div class="display-area">
-                <div id="status-info" style="position: absolute; top: 15px; color: #666; font-size: 11px; letter-spacing: 2px;">PREPARING...</div>
-                <div id="multi-text">1.00x</div>
-                <img id="rocket-obj" class="rocket-anim" src="https://img.icons8.com/external-flatart-icons-flat-flatarticons/64/000000/external-rocket-space-flatart-icons-flat-flatarticons.png" style="filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(328deg) brightness(118%) contrast(119%);">
-            </div>
-
-            <div class="bet-box">
-                <input type="number" id="user-bet" class="amt-input" value="10">
-                <button id="main-btn" class="btn-action" onclick="processBet()">BET</button>
-            </div>
+    <div id="page-gorush">
+        <div class="crash-screen">
+            <div id="crash-status" style="position: absolute; top: 8px; color: #666; font-size: 10px; letter-spacing: 1px;">PREPARING...</div>
+            <div id="multi-val">1.00x</div>
+            <img id="rocket" src="https://img.icons8.com/external-flatart-icons-flat-flatarticons/64/000000/external-rocket-space-flatart-icons-flat-flatarticons.png" style="filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(328deg) brightness(118%) contrast(119%);">
         </div>
-
-        <p class="section-label">Popular Turbo Games</p>
-        <div class="games-grid">
-            <div class="game-item"><span class="badge">HOT</span><img src="https://i.imgur.com/B7yM7yM.jpg"><div class="game-title">Mines</div></div>
-            <div class="game-item"><img src="https://i.imgur.com/pYvV8vV.jpg"><div class="game-title">Aviator</div></div>
-            <div class="game-item"><img src="https://i.imgur.com/yourpoker.jpg"><div class="game-title">Dice</div></div>
+        <div class="control-panel">
+            <input type="number" id="bet-gorush" class="input-paisa" value="10">
+            <button id="btn-gorush" class="btn-action" onclick="betGoRush()">BET</button>
         </div>
     </div>
 
-    <div id="pay-screen" class="hidden" style="position:fixed; top:0; background:var(--bg); width:100%; height:100%; z-index:2000; padding:20px; text-align:center;">
-        <button onclick="togglePay(false)" style="float:left; background:none; border:none; color:#fff; font-size:30px;">⬅</button>
-        <h2 style="color:var(--gold); margin-top: 50px;">Deposit Funds</h2>
-        <div id="qr-box" style="background:#fff; padding:15px; width:200px; margin:30px auto; border-radius:15px; box-shadow: 0 0 30px rgba(255,223,142,0.2);"></div>
-        <p style="color:#aaa;">Official UPI ID: <br><b style="color:#fff; font-size: 18px;">7470807k@nyes</b></p>
-        <input type="number" id="utr-ref" class="amt-input" style="width: 90%;" placeholder="Enter 12-Digit UTR">
-        <button class="btn-action" style="width: 90%;" onclick="alert('Submission Received!')">CONFIRM PAYMENT</button>
+    <div id="page-mines" class="hidden">
+        <h3 style="text-align:center; color:var(--gold); margin:10px 0;">TURBO MINES</h3>
+        <div class="mines-grid" id="mines-board"></div>
+        <div class="control-panel">
+            <input type="number" id="bet-mines" class="input-paisa" value="10">
+            <button id="btn-mines" class="btn-action" onclick="startMines()">START GAME</button>
+        </div>
+    </div>
+
+    <div style="padding-left: 20px; font-size: 12px; color: #777;">SELECT GAME</div>
+    <div class="games-list">
+        <div class="game-card" onclick="showGame('gorush')"><img src="https://i.imgur.com/pYvV8vV.jpg"><br>GoRush</div>
+        <div class="game-card" onclick="showGame('mines')"><img src="https://i.imgur.com/B7yM7yM.jpg"><br>Mines</div>
+        <div class="game-card"><img src="https://i.imgur.com/yourpoker.jpg"><br>Dice</div>
     </div>
 
 <script>
-    let currentBal = 10.00;
-    let currentMulti = 1.00;
-    let isGameRunning = false;
-    let isBetActive = false;
-    let engine;
+    let balance = 10.00;
+    let crashRunning = false, crashBet = false, crashMulti = 1.00, crashInt;
+    let minesActive = false, minesMulti = 1.00, mineCount = 3, mineLocs = [];
 
-    function processBet() {
-        let btn = document.getElementById('main-btn');
-        let amt = parseFloat(document.getElementById('user-bet').value);
+    // --- SYSTEM ---
+    function updateBal() { document.getElementById('main-bal').innerText = balance.toFixed(2); }
+    function showGame(g) {
+        document.getElementById('page-gorush').classList.toggle('hidden', g !== 'gorush');
+        document.getElementById('page-mines').classList.toggle('hidden', g !== 'mines');
+    }
 
-        if(!isGameRunning && !isBetActive) {
-            if(amt > currentBal) return alert("Insufficient Balance");
-            currentBal -= amt;
-            updateBalance();
-            isBetActive = true;
-            btn.innerText = "WAITING...";
-            btn.style.opacity = "0.5";
-        } else if(isGameRunning && isBetActive) {
-            // Cashout Logic
-            let winning = amt * currentMulti;
-            currentBal += winning;
-            isBetActive = false;
-            btn.innerText = "WIN: ₹" + winning.toFixed(2);
+    // --- GORUSH LOGIC ---
+    function betGoRush() {
+        let btn = document.getElementById('btn-gorush');
+        let amt = parseFloat(document.getElementById('bet-gorush').value);
+        if(!crashRunning && !crashBet) {
+            if(amt > balance) return alert("Balance low!");
+            balance -= amt; updateBal(); crashBet = true;
+            btn.innerText = "WAITING..."; btn.style.opacity="0.5";
+        } else if(crashRunning && crashBet) {
+            let win = amt * crashMulti; balance += win; updateBal();
+            crashBet = false; btn.innerText = "WIN: ₹" + win.toFixed(2);
             btn.classList.add('btn-cashout');
-            updateBalance();
             setTimeout(() => { btn.classList.remove('btn-cashout'); btn.innerText = "BET"; }, 2000);
         }
     }
 
-    function runEngine() {
-        let crashPoint = (Math.random() * 4.5 + 1.05).toFixed(2);
-        currentMulti = 1.00;
-        isGameRunning = true;
-        document.getElementById('status-info').innerText = "LIVE";
-        document.getElementById('multi-text').style.color = "var(--gold)";
-        
-        let btn = document.getElementById('main-btn');
-        if(isBetActive) { btn.innerText = "CASH OUT"; btn.style.opacity = "1"; }
+    function runCrash() {
+        let crashAt = (Math.random() * 3.5 + 1.05).toFixed(2);
+        crashMulti = 1.00; crashRunning = true;
+        document.getElementById('crash-status').innerText = "LIVE";
+        let btn = document.getElementById('btn-gorush');
+        if(crashBet) { btn.innerText = "CASH OUT"; btn.style.opacity="1"; }
 
-        engine = setInterval(() => {
-            currentMulti += 0.01;
-            document.getElementById('multi-text').innerText = currentMulti.toFixed(2) + "x";
-            
-            // Rocket VC Animation
-            let rocket = document.getElementById('rocket-obj');
-            rocket.style.left = (20 + (currentMulti-1)*45) + "px";
-            rocket.style.bottom = (20 + (currentMulti-1)*55) + "px";
+        crashInt = setInterval(() => {
+            crashMulti += 0.01;
+            document.getElementById('multi-val').innerText = crashMulti.toFixed(2) + "x";
+            let r = document.getElementById('rocket');
+            r.style.left = (10 + (crashMulti-1)*40) + "px";
+            r.style.bottom = (10 + (crashMulti-1)*50) + "px";
 
-            if(currentMulti >= crashPoint) {
-                clearInterval(engine);
-                isGameRunning = false;
-                document.getElementById('multi-text').innerText = "FLEW AWAY!";
-                document.getElementById('multi-text').style.color = "var(--red)";
-                document.getElementById('status-info').innerText = "CRASHED @ " + crashPoint + "x";
-                
-                // Add to History Bar
-                let history = document.getElementById('history-container');
-                let color = crashPoint > 2 ? "#9c27b0" : "var(--gold)";
-                history.innerHTML = `<div class="hist-chip" style="color:${color}">${crashPoint}x</div>` + history.innerHTML;
-
-                if(isBetActive) { btn.innerText = "LOST!"; isBetActive = false; }
-
+            if(crashMulti >= crashAt) {
+                clearInterval(crashInt); crashRunning = false;
+                document.getElementById('multi-val').style.color = "red";
+                document.getElementById('crash-status').innerText = "CRASHED @ " + crashAt;
+                if(crashBet) { btn.innerText = "LOST!"; crashBet = false; }
                 setTimeout(() => {
-                    document.getElementById('multi-text').innerText = "1.00x";
-                    rocket.style.left = "20px"; rocket.style.bottom = "20px";
+                    document.getElementById('multi-val').innerText = "1.00x";
+                    document.getElementById('multi-val').style.color = "var(--gold)";
+                    r.style.left="10px"; r.style.bottom="10px";
                     btn.innerText = "BET";
-                    document.getElementById('status-info').innerText = "NEXT ROUND IN 5s";
-                    setTimeout(runEngine, 5000);
-                }, 4000);
+                    document.getElementById('crash-status').innerText = "NEXT ROUND IN 5s";
+                    setTimeout(runCrash, 5000);
+                }, 3000);
             }
         }, 80);
     }
 
-    function updateBalance() { document.getElementById('bal-amt').innerText = currentBal.toFixed(2); }
-    
-    function togglePay(show) {
-        document.getElementById('pay-screen').classList.toggle('hidden', !show);
-        if(show) {
-            document.getElementById('qr-box').innerHTML = "";
-            new QRCode(document.getElementById("qr-box"), { text: "upi://pay?pa=7470807k@nyes&pn=LGCLUB&am=100&cu=INR", width: 200, height: 200 });
+    // --- MINES LOGIC ---
+    function initMines() {
+        let board = document.getElementById('mines-board'); board.innerHTML = "";
+        for(let i=0; i<25; i++) {
+            let box = document.createElement('div');
+            box.className = 'mine-box'; box.innerHTML = "❓";
+            box.onclick = () => openMine(i, box);
+            board.appendChild(box);
         }
     }
 
-    // Initial Start
-    setTimeout(runEngine, 3000);
+    function startMines() {
+        let btn = document.getElementById('btn-mines');
+        let amt = parseFloat(document.getElementById('bet-mines').value);
+        if(!minesActive) {
+            if(amt > balance) return alert("Balance low!");
+            balance -= amt; updateBal();
+            minesActive = true; minesMulti = 1.00;
+            mineLocs = []; while(mineLocs.length < 3) {
+                let r = Math.floor(Math.random()*25);
+                if(!mineLocs.includes(r)) mineLocs.push(r);
+            }
+            initMines(); btn.innerText = "CASH OUT (1.00x)"; btn.classList.add('btn-cashout');
+        } else {
+            let win = amt * minesMulti; balance += win; updateBal();
+            minesActive = false; alert("Cashed Out: ₹" + win.toFixed(2));
+            btn.innerText = "START GAME"; btn.classList.remove('btn-cashout');
+            initMines();
+        }
+    }
+
+    function openMine(idx, box) {
+        if(!minesActive || box.classList.contains('open')) return;
+        box.classList.add('open');
+        if(mineLocs.includes(idx)) {
+            box.innerHTML = "💣"; box.style.background = "red";
+            alert("BOOM! Game Over"); minesActive = false;
+            document.getElementById('btn-mines').innerText = "START GAME";
+            document.getElementById('btn-mines').classList.remove('btn-cashout');
+            setTimeout(initMines, 2000);
+        } else {
+            box.innerHTML = "💎"; box.style.background = "var(--green)";
+            minesMulti += 0.35;
+            document.getElementById('btn-mines').innerText = "CASH OUT (" + minesMulti.toFixed(2) + "x)";
+        }
+    }
+
+    // Init
+    initMines(); setTimeout(runCrash, 3000);
 </script>
 </body>
 </html>
